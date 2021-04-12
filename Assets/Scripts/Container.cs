@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Container : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject prize;
+    public GameObject prize;
     [SerializeField]
     private Animator animator;
     private bool isOpened;

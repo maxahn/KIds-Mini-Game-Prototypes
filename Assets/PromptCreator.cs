@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System;
 
@@ -18,12 +17,14 @@ public class PromptCreator : MonoBehaviour
     private GameObject PromptList;
     [SerializeField]
     private GameObject PromptListItemPrefab;
+    private GameManager gameManager;
 
     private List<Prompt> prompts;
 
     private void Start()
     {
         prompts = new List<Prompt>();
+        gameManager = GameManager.Instance;
     }
 
     public void AddToPromptList()
@@ -38,7 +39,7 @@ public class PromptCreator : MonoBehaviour
 
     public void SavePromptCollection()
     {
-        PromptCollection promptCollection = new PromptCollection(currentCollectionNameInput.text, prompts, DateTime.Now, DateTime.Now);
+        PromptCollection promptCollection = new PromptCollection(currentCollectionNameInput.text, prompts.ToArray(), DateTime.Now, DateTime.Now);
         string fileName = currentCollectionNameInput.text;
         string json = JsonUtility.ToJson(promptCollection);
         StreamWriter writer = File.CreateText($"{Application.persistentDataPath}/{fileName}.json");
@@ -53,5 +54,10 @@ public class PromptCreator : MonoBehaviour
 
     public void LoadPromptList()
     {
+    }
+
+    public void StartGame()
+    {
+        gameManager.StartGame(prompts.ToArray());
     }
 }

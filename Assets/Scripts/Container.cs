@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Container : MonoBehaviour
 {
-    public GameObject prize;
-    [SerializeField]
+    public GameObject prize, promptCard;
     private Animator animator;
     private bool isOpened;
 
@@ -17,7 +16,7 @@ public class Container : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (!isOpened)
+        if (!isOpened && !GameManager.Instance.isPanelOpen)
         {
             animator.Play("Open Chest");
             this.isOpened = true; 

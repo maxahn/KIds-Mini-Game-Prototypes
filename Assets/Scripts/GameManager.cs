@@ -8,7 +8,7 @@ public class GameManager : Singleton<GameManager>
 {
     public bool isPanelOpen; 
     [SerializeField]
-    private GameObject chests, panel;
+    private GameObject chests, backgroundPanel, gameGeneratorPanel, prizePromptPanel;
     [SerializeField]
     private Container[] containers;
     [SerializeField]
@@ -17,19 +17,25 @@ public class GameManager : Singleton<GameManager>
     private PromptCollection activePromptCollection;
     [SerializeField]
     private Sprite[] prizeSprites;
+    private Animator animator;
+    private GameManager gameManager;
+
 
     void Start()
     {
         isPanelOpen = true;
         containers = chests.GetComponentsInChildren<Container>();
         prizeSprites = Resources.LoadAll<Sprite>("Toy Images");
+        animator = GetComponent<Animator>();
+        gameManager = GameManager.Instance;
     }
 
     public void StartGame(Prompt[] prompts)
     {
         Debug.Log(prompts.Length);
         PopulateContainers(prompts);
-        panel.SetActive(false);
+        backgroundPanel.SetActive(false);
+        gameGeneratorPanel.SetActive(false);
         isPanelOpen = false;
     }
 
@@ -50,22 +56,37 @@ public class GameManager : Singleton<GameManager>
         for (int i = 0; i < containers.Length; i++)
         {
             int choice = Random.Range(0, 2);
-            Debug.Log($"random numberl: {choice}"); 
-            if (choice == 0 && promptIndex < prompts.Length) // prize
+            Container container = containers[i];
+            if (choice == 0 && promptIndex < prompts.Length) // prompt
             {
-                containers[i].prize.SetActive(false);
-                containers[i].promptCard.SetActive(true);
-                containers[i].promptCard.GetComponentInChildren<TMP_Text>().text = prompts[promptIndex].text;
+                string text = prompts[promptIndex].text;
+                container.prize.SetActive(false);
+                container.promptCard.SetActive(true);
+                container.promptCard.GetComponentInChildren<TMP_Text>().text = text; 
+                container.isPrize = false;
+                container.prizePrompt = text;
                 promptIndex += 1;
-            } else // prompt
+            } else // prize
             {
                 Sprite sprite = prizeSprites[prizeIndex % prizeSprites.Length];
-                Debug.Log($"prizeIndex: {prizeIndex}, promptIndex: {promptIndex}");
-                Debug.Log(sprite);
-                containers[i].prize.GetComponent<SpriteRenderer>().sprite = sprite;
+                container.prize.GetComponent<SpriteRenderer>().sprite = sprite;
+                container.isPrize = true;
                 prizeIndex += 1;
             }
 
         }
+    }
+
+    public void ActivatePrizePrompt(string prompt)
+    {
+        prizePromptPanel.GetComponentInChildren<TMP_Text>().text = prompt;
+        prizePromptPanel.SetActive(true);
+        isPanelOpen = true;
+    }
+
+    public void DeactivatePrizePrompt(string prompt)
+    {
+        prizePromptPanel.SetActive(false);
+        isPanelOpen = false;
     }
 }
